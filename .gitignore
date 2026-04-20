@@ -215,3 +215,5 @@ pyrightconfig.json
 # dirs
 data/
 docs/
+notebooks/
+tests/
