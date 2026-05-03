@@ -6,7 +6,10 @@ def enviar_email_com_anexo(caminho_completo_pdf, nome_arquivo):
     msg = EmailMessage()
     msg['Subject'] = f"Novo Diário Disponível: {nome_arquivo}"
     msg['From'] = EMAIL_REMETENTE
-    msg['To'] = EMAIL_DESTINATARIO
+    
+    # Concatena a lista de destinatários com vírgulas
+    msg['To'] = ", ".join(EMAIL_DESTINATARIO)
+    
     msg.set_content(f"O sistema detectou uma nova publicação: {nome_arquivo}")
 
     try:

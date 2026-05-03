@@ -14,4 +14,7 @@ PASTA_DESTINO = os.getenv("PATH_PDF")
 # O segundo argumento é um valor padrão caso a variável não seja encontrada
 EMAIL_REMETENTE = os.getenv("EMAIL_REMETENTE")
 SENHA_APP = os.getenv("SENHA_EMAIL")
-EMAIL_DESTINATARIO = os.getenv("EMAIL_DESTINATARIO")
+EMAIL_DESTINATARIO = [
+    'guilherme.cioccia@gmail.com',
+    'lethycia.anjoss@gmail.com'
+]
