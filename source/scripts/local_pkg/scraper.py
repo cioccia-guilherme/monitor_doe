@@ -3,7 +3,17 @@ from bs4 import BeautifulSoup
 import os
 import csv
 import re
+import base64
+import json
+import urllib.parse
+import urllib3
 from .config import URL_SITE, BASE_URL, HISTORICO_CSV
+
+# Desativa os avisos de segurança para conexões sem verificação SSL
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+# Desativa avisos de certificado SSL
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 def carregar_historico_urls():
     if not os.path.exists(HISTORICO_CSV):
@@ -48,3 +58,47 @@ def buscar_links_atuais():
     except Exception as e:
         print(f"Erro ao acessar o site: {e}")
         return []
+
+def buscar_links_atuais_diogrande():
+    url_api = "https://diogrande.campogrande.ms.gov.br/wp-admin/admin-ajax.php?action=edicao2_dia_json"
+    headers = {'User-Agent': 'Mozilla/5.0'}
+    
+    # Cria uma sessão do requests forçando a desativação do SSL
+    session = requests.Session()
+    session.verify = False
+    
+    try:
+        response = session.get(url_api, headers=headers, timeout=20)
+        response.raise_for_status()  # Levanta exceção para erros HTTP
+        
+        dados = response.json()
+        resultados = []
+        
+        # Uso do .get() para evitar erros caso a estrutura do JSON mude
+        atual = dados.get('atual')
+        ultimas_edicoes = dados.get('ultimasedicoes', [])
+        
+        todas = [atual] + ultimas_edicoes if atual else ultimas_edicoes
+        
+        for edicao in todas:
+            for arq in edicao.get('arquivos', []):
+                payload = {"codigodia": str(arq['codigodia'])}
+                json_str = json.dumps(payload, separators=(',', ':'))
+                b64 = base64.b64encode(json_str.encode('utf-8')).decode('utf-8')
+                b64_url = urllib.parse.quote(b64)
+                url = f"https://diogrande.campogrande.ms.gov.br/download_edicao/{b64_url}.pdf"
+                
+                nome_arquivo = f"diogrande_{arq.get('numeroFormatado', '')}_{str(arq.get('nomearquivo', '')).replace(' ', '_')}.pdf"
+                
+                resultados.append({
+                    'url': url,
+                    'pdf_name': nome_arquivo
+                })
+        return resultados
+        
+    except requests.exceptions.RequestException as e:
+        print(f"Erro de rede ou HTTP na API do Diogrande: {e}")
+    except Exception as e:
+        print(f"Erro ao processar os dados da API do Diogrande: {e}")
+        
+    return []

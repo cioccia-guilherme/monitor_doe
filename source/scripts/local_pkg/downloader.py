@@ -1,6 +1,10 @@
 import requests
 import os
+import urllib3
 from .config import PASTA_DESTINO
+
+# Desativa avisos de segurança SSL
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 def baixar_arquivo_individual(url, nome_arquivo):
     if not os.path.exists(PASTA_DESTINO):
@@ -15,7 +19,9 @@ def baixar_arquivo_individual(url, nome_arquivo):
     try:
         print(f"[+] Baixando: {nome_arquivo}...")
         headers = {'User-Agent': 'Mozilla/5.0'}
-        response = requests.get(url, headers=headers, timeout=60, stream=True)
+        
+        # Adicionado verify=False para ignorar a validação do certificado SSL
+        response = requests.get(url, headers=headers, timeout=60, stream=True, verify=False)
         response.raise_for_status()
 
         with open(caminho_completo, "wb") as f:

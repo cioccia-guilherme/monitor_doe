@@ -1,6 +1,7 @@
 import os
 from local_pkg import (
-    buscar_links_atuais, 
+    buscar_links_atuais,
+    buscar_links_atuais_diogrande, 
     carregar_historico_urls, 
     salvar_no_historico,
     baixar_arquivo_individual,
@@ -13,7 +14,9 @@ def executar():
     
     # 1. Mapeamento
     urls_vistas = carregar_historico_urls()
-    dados_atuais = buscar_links_atuais()
+    
+    # Busca dados do Diogrande E do site original (DOE)
+    dados_atuais = buscar_links_atuais_diogrande() + buscar_links_atuais()
     
     # 2. Identificação de Novidades
     novos = [item for item in dados_atuais if item['url'] not in urls_vistas]
