@@ -12,9 +12,6 @@ from .config import URL_SITE, BASE_URL, HISTORICO_CSV
 # Desativa os avisos de segurança para conexões sem verificação SSL
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-# Desativa avisos de certificado SSL
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
 def carregar_historico_urls():
     if not os.path.exists(HISTORICO_CSV):
         return set()
